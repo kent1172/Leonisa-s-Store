@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Migration: Products - Leonisa's Store</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 40px auto; padding: 0 20px; background-color: #f4f7f6; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #4f46e5; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-top: 0; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 6px; overflow-x: auto; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; position: relative; white-space: pre-wrap; word-break: break-all; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: #4f46e5; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .copy-btn:hover { background: #4338ca; }
+        .instructions { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 0 4px 4px 0; font-size: 14px; }
+        code { background: #e5e7eb; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+        .category-header { color: #4f46e5; font-weight: bold; margin-top: 20px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bulk Inventory Import</h1>
+        
+        <div class="instructions">
+            <strong>Action Required:</strong>
+            <ol>
+                <li>Open your <strong>Supabase SQL Editor</strong>.</li>
+                <li>Copy the SQL code below.</li>
+                <li>Paste it and click <strong>Run</strong>.</li>
+            </ol>
+            <p>This will add <strong>100+ items</strong> categorized exactly as requested into your store's database.</p>
+        </div>
+
+        <pre id="sql-block"><button class="copy-btn" onclick="copySql()">Copy Code</button>-- Leonisa's Store - Bulk Product Import
+-- Categories: Basic Goods, Instant Food, Sachets, Snacks, Candies, Beverages, Cigarettes, Personal Care, Household, Frozen, School/Misc
+
+INSERT INTO public.products (name, price, category, status) VALUES
+-- 🧂 Basic Goods & Condiments
+('Sugar (1 kilo)', 70.00, 'Basic Goods & Condiments', 'active'),
+('Rice (1 kilo)', 55.00, 'Basic Goods & Condiments', 'active'),
+('Salt (250g)', 10.00, 'Basic Goods & Condiments', 'active'),
+('Cooking Oil (250ml)', 25.00, 'Basic Goods & Condiments', 'active'),
+('Soy Sauce (toyo, 200ml)', 18.00, 'Basic Goods & Condiments', 'active'),
+('Vinegar (suka, 200ml)', 15.00, 'Basic Goods & Condiments', 'active'),
+('Fish Sauce (patis, 200ml)', 20.00, 'Basic Goods & Condiments', 'active'),
+('MSG (Ajinomoto, 100g)', 25.00, 'Basic Goods & Condiments', 'active'),
+('Black Pepper (sachet)', 5.00, 'Basic Goods & Condiments', 'active'),
+('Ketchup (sachet)', 5.00, 'Basic Goods & Condiments', 'active'),
+
+-- 🍜 Instant & Canned Food
+('Lucky Me Pancit Canton', 15.00, 'Instant & Canned Food', 'active'),
+('Lucky Me Beef Noodles', 15.00, 'Instant & Canned Food', 'active'),
+('Nissin Cup Noodles', 35.00, 'Instant & Canned Food', 'active'),
+('Sardines (Ligo, small can)', 25.00, 'Instant & Canned Food', 'active'),
+('Sardines (555, small can)', 23.00, 'Instant & Canned Food', 'active'),
+('Corned Beef (Argentina, 100g)', 35.00, 'Instant & Canned Food', 'active'),
+('Meat Loaf (small can)', 25.00, 'Instant & Canned Food', 'active'),
+('Tuna (Century, small can)', 35.00, 'Instant & Canned Food', 'active'),
+('Instant Arroz Caldo', 25.00, 'Instant & Canned Food', 'active'),
+('Cup Rice Meal', 45.00, 'Instant & Canned Food', 'active'),
+
+-- 🥫 Sachets & Packaged Items
+('Coffee (Nescafé Stick)', 8.00, 'Sachets & Packaged Items', 'active'),
+('Coffee (Great Taste Stick)', 8.00, 'Sachets & Packaged Items', 'active'),
+('Creamer (Coffee Mate sachet)', 5.00, 'Sachets & Packaged Items', 'active'),
+('Sugar Sachet', 5.00, 'Sachets & Packaged Items', 'active'),
+('Milo Sachet', 10.00, 'Sachets & Packaged Items', 'active'),
+('Bear Brand Milk Sachet', 12.00, 'Sachets & Packaged Items', 'active'),
+('Alaska Milk Sachet', 12.00, 'Sachets & Packaged Items', 'active'),
+('Powdered Juice (Tang)', 20.00, 'Sachets & Packaged Items', 'active'),
+('Chocolate Drink Sachet', 10.00, 'Sachets & Packaged Items', 'active'),
+('Ovaltine Sachet', 12.00, 'Sachets & Packaged Items', 'active'),
+
+-- 🍪 Snacks & Biscuits
+('SkyFlakes Crackers', 8.00, 'Snacks & Biscuits', 'active'),
+('Fita Crackers', 8.00, 'Snacks & Biscuits', 'active'),
+('Rebisco Crackers', 8.00, 'Snacks & Biscuits', 'active'),
+('Choco Mucho', 12.00, 'Snacks & Biscuits', 'active'),
+('Cream-O', 10.00, 'Snacks & Biscuits', 'active'),
+('Oreo (small pack)', 15.00, 'Snacks & Biscuits', 'active'),
+('Stick-O', 12.00, 'Snacks & Biscuits', 'active'),
+('Bingo Cookies', 10.00, 'Snacks & Biscuits', 'active'),
+('SuperStix', 10.00, 'Snacks & Biscuits', 'active'),
+('Hansel Crackers', 12.00, 'Snacks & Biscuits', 'active'),
+
+-- 🍬 Candies & Chocolates
+('Maxx Candy', 2.00, 'Candies & Chocolates', 'active'),
+('SnowBear Candy', 2.00, 'Candies & Chocolates', 'active'),
+('Dynamite Candy', 2.00, 'Candies & Chocolates', 'active'),
+('Flat Tops Chocolate', 5.00, 'Candies & Chocolates', 'active'),
+('Chocnut', 5.00, 'Candies & Chocolates', 'active'),
+('Cloud 9', 12.00, 'Candies & Chocolates', 'active'),
+('Nips Chocolate', 3.00, 'Candies & Chocolates', 'active'),
+('Mentos', 2.00, 'Candies & Chocolates', 'active'),
+('White Rabbit Candy', 2.00, 'Candies & Chocolates', 'active'),
+('Butterball Candy', 2.00, 'Candies & Chocolates', 'active'),
+
+-- 🥤 Beverages
+('Coke Mismo', 20.00, 'Beverages', 'active'),
+('Pepsi Mismo', 20.00, 'Beverages', 'active'),
+('Sprite Mismo', 20.00, 'Beverages', 'active'),
+('Mountain Dew Mismo', 20.00, 'Beverages', 'active'),
+('RC Cola Mismo', 18.00, 'Beverages', 'active'),
+('C2 Green Tea (355ml)', 25.00, 'Beverages', 'active'),
+('Zesto Juice', 15.00, 'Beverages', 'active'),
+('Nestea Iced Tea', 20.00, 'Beverages', 'active'),
+('Mineral Water (500ml)', 15.00, 'Beverages', 'active'),
+('Energy Drink (Sting)', 25.00, 'Beverages', 'active'),
+
+-- 🚬 Cigarettes (Per Stick)
+('Marlboro Red (stick)', 10.00, 'Cigarettes (Per Stick)', 'active'),
+('Marlboro Blue (stick)', 10.00, 'Cigarettes (Per Stick)', 'active'),
+('Fortune (stick)', 8.00, 'Cigarettes (Per Stick)', 'active'),
+('Hope (stick)', 7.00, 'Cigarettes (Per Stick)', 'active'),
+('Winston (stick)', 8.00, 'Cigarettes (Per Stick)', 'active'),
+
+-- 🧼 Personal Care
+('Safeguard Soap (bar)', 35.00, 'Personal Care', 'active'),
+('Palmolive Shampoo Sachet', 7.00, 'Personal Care', 'active'),
+('Head & Shoulders Sachet', 7.00, 'Personal Care', 'active'),
+('CreamSilk Sachet', 7.00, 'Personal Care', 'active'),
+('Toothpaste (Colgate sachet)', 7.00, 'Personal Care', 'active'),
+('Toothbrush', 25.00, 'Personal Care', 'active'),
+('Bath Soap Sachet', 10.00, 'Personal Care', 'active'),
+('Face Towel', 30.00, 'Personal Care', 'active'),
+('Cotton Buds', 15.00, 'Personal Care', 'active'),
+('Alcohol Sachet', 10.00, 'Personal Care', 'active'),
+
+-- 🧽 Household Items
+('Detergent Powder (Surf sachet)', 10.00, 'Household Items', 'active'),
+('Detergent Powder (Ariel sachet)', 12.00, 'Household Items', 'active'),
+('Fabric Conditioner (Downy sachet)', 10.00, 'Household Items', 'active'),
+('Dishwashing Liquid (sachet)', 10.00, 'Household Items', 'active'),
+('Bleach (sachet)', 10.00, 'Household Items', 'active'),
+('Sponge', 15.00, 'Household Items', 'active'),
+('Candles', 10.00, 'Household Items', 'active'),
+('Matches', 5.00, 'Household Items', 'active'),
+('Trash Bag (small)', 20.00, 'Household Items', 'active'),
+('Insect Killer Coil', 10.00, 'Household Items', 'active'),
+
+-- 🧊 Frozen / Miscellaneous
+('Ice Tube', 10.00, 'Frozen / Miscellaneous', 'active'),
+('Ice Candy', 5.00, 'Frozen / Miscellaneous', 'active'),
+('Hotdog (per piece)', 15.00, 'Frozen / Miscellaneous', 'active'),
+('Fish Ball (per pack)', 30.00, 'Frozen / Miscellaneous', 'active'),
+('Kikiam (per pack)', 30.00, 'Frozen / Miscellaneous', 'active'),
+
+-- 🧴 School & Misc
+('Ballpen', 10.00, 'School & Misc', 'active'),
+('Pencil', 5.00, 'School & Misc', 'active'),
+('Notebook', 25.00, 'School & Misc', 'active'),
+('Correction Tape', 15.00, 'School & Misc', 'active'),
+('Envelope', 5.00, 'School & Misc', 'active'),
+('Phone Load (₱50)', 50.00, 'School & Misc', 'active'),
+('Phone Load (₱100)', 100.00, 'School & Misc', 'active'),
+('Face Mask', 5.00, 'School & Misc', 'active'),
+('Lighter', 15.00, 'School & Misc', 'active'),
+('Plastic Cup', 5.00, 'School & Misc', 'active');</pre>
+    </div>
+
+    <script>
+        function copySql() {
+            const pre = document.getElementById('sql-block');
+            const text = pre.innerText.replace('Copy Code', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy Code', 2000);
+            });
+        }
+    </script>
+</body>
+</html>

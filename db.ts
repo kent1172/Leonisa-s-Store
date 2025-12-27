@@ -1,94 +1,114 @@
 
-import { Product, Sale, User, UserRole, SaleItem } from './types';
-
-const STORAGE_KEY = 'leonisa_store_db';
-
-interface DBStructure {
-  products: Product[];
-  sales: Sale[];
-  users: User[];
-}
-
-const DEFAULT_DB: DBStructure = {
-  users: [
-    { id: 1, username: 'admin', role: UserRole.ADMIN, createdAt: new Date().toISOString() },
-    { id: 2, username: 'cashier1', role: UserRole.CASHIER, createdAt: new Date().toISOString() },
-  ],
-  products: [
-    { id: 1, name: 'Premium Espresso Beans 1kg', price: 45.00, category: 'Coffee', status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: 2, name: 'Artisan Dark Chocolate', price: 12.50, category: 'Sweets', status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-    { id: 3, name: 'Honey Lavender Syrup', price: 18.00, category: 'Beverages', status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-  ],
-  sales: []
-};
-
-export const getDB = (): DBStructure => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : DEFAULT_DB;
-};
-
-export const saveDB = (db: DBStructure) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-};
+import { supabase } from './supabase';
+import { Product, Sale, SaleItem } from './types';
 
 // Products API
 export const productAPI = {
-  getAll: () => getDB().products,
-  getActive: () => getDB().products.filter(p => p.status === 'active'),
-  save: (product: Partial<Product>) => {
-    const db = getDB();
-    if (product.id) {
-      db.products = db.products.map(p => p.id === product.id ? { ...p, ...product, updatedAt: new Date().toISOString() } as Product : p);
-    } else {
-      const newProduct: Product = {
-        ...(product as any),
-        id: Math.max(0, ...db.products.map(p => p.id)) + 1,
-        status: product.status || 'active',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      db.products.push(newProduct);
-    }
-    saveDB(db);
+  getAll: async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return data as Product[];
   },
-  delete: (id: number) => {
-    const db = getDB();
-    db.products = db.products.map(p => p.id === id ? { ...p, status: 'inactive' } as Product : p);
-    saveDB(db);
+  
+  getActive: async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('status', 'active')
+      .order('name', { ascending: true });
+    if (error) throw error;
+    return data as Product[];
+  },
+
+  save: async (product: Partial<Product>) => {
+    if (product.id) {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          name: product.name,
+          price: product.price,
+          category: product.category,
+          status: product.status,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', product.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from('products')
+        .insert([{
+          name: product.name,
+          price: product.price,
+          category: product.category,
+          status: product.status || 'active'
+        }]);
+      if (error) throw error;
+    }
+  },
+
+  delete: async (id: number) => {
+    const { error } = await supabase
+      .from('products')
+      .update({ status: 'inactive' })
+      .eq('id', id);
+    if (error) throw error;
   }
 };
 
 // Sales API
 export const salesAPI = {
-  getAll: () => getDB().sales,
-  create: (items: { productId: number; quantity: number }[]) => {
-    const db = getDB();
-    const products = db.products;
+  getAll: async () => {
+    const { data, error } = await supabase
+      .from('sales')
+      .select(`
+        *,
+        sale_items (
+          *,
+          products (name)
+        )
+      `)
+      .order('created_at', { ascending: false });
     
-    const saleItems: SaleItem[] = items.map((item, index) => {
-      const product = products.find(p => p.id === item.productId)!;
-      const lineTotal = product.price * item.quantity;
-      return {
-        id: index + 1,
-        saleId: 0, // Placeholder
-        productId: product.id,
-        productName: product.name,
-        quantity: item.quantity,
-        priceAtSale: product.price,
-        lineTotal
-      };
-    });
+    if (error) throw error;
+    return data;
+  },
 
-    const totalAmount = saleItems.reduce((acc, item) => acc + item.lineTotal, 0);
-    const newSale: Sale = {
-      id: Math.max(0, ...db.sales.map(s => s.id)) + 1,
-      totalAmount,
-      createdAt: new Date().toISOString(),
-      items: saleItems.map(si => ({ ...si, saleId: Math.max(0, ...db.sales.map(s => s.id)) + 1 }))
-    };
+  create: async (items: { productId: number; quantity: number; price: number }[]) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("No authenticated user");
 
-    db.sales.unshift(newSale);
-    saveDB(db);
-    return newSale;
+    const totalAmount = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    // 1. Create the Sale record
+    const { data: sale, error: saleError } = await supabase
+      .from('sales')
+      .insert([{
+        total_amount: totalAmount,
+        created_by: user.id
+      }])
+      .select()
+      .single();
+
+    if (saleError) throw saleError;
+
+    // 2. Create the Sale Items
+    const saleItemsData = items.map(item => ({
+      sale_id: sale.id,
+      product_id: item.productId,
+      quantity: item.quantity,
+      price_at_sale: item.price,
+      line_total: item.price * item.quantity
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('sale_items')
+      .insert(saleItemsData);
+
+    if (itemsError) throw itemsError;
+
+    return sale;
   }
 };

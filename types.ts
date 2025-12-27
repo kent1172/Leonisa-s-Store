@@ -5,7 +5,7 @@ export enum UserRole {
 }
 
 export interface User {
-  id: number;
+  id: string; // UUID from Auth
   username: string;
   role: UserRole;
   createdAt: string;
@@ -17,30 +17,32 @@ export interface Product {
   price: number;
   category: string;
   status: 'active' | 'inactive';
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SaleItem {
   id: number;
-  saleId: number;
-  productId: number;
-  productName: string;
+  sale_id: number;
+  product_id: number;
+  product_name?: string; // Helper for UI
   quantity: number;
-  priceAtSale: number;
-  lineTotal: number;
+  price_at_sale: number;
+  line_total: number;
+  products?: Partial<Product>; // For joined queries
 }
 
 export interface Sale {
   id: number;
-  totalAmount: number;
-  createdAt: string;
-  items: SaleItem[];
+  total_amount: number;
+  created_at: string;
+  created_by: string;
+  sale_items?: SaleItem[];
 }
 
 export interface DashboardStats {
-  totalSalesToday: number;
-  totalSalesMonth: number;
+  todaySales: number;
+  monthSales: number;
   activeProducts: number;
-  recentSales: Sale[];
+  totalOrders: number;
 }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert Admin - Leonisa's Store</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 0 20px; background-color: #f0f2f5; }
+        .card { background: #fff; padding: 32px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        h1 { color: #1f2937; margin-top: 0; font-size: 24px; border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; }
+        p { color: #4b5563; margin-bottom: 24px; }
+        .code-container { position: relative; background: #111827; border-radius: 8px; overflow: hidden; }
+        pre { color: #e5e7eb; padding: 20px; margin: 0; font-family: 'ui-monospace', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+        .copy-button { position: absolute; top: 12px; right: 12px; background: #4f46e5; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .copy-button:hover { background: #4338ca; }
+        .warning { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; margin-top: 24px; border-radius: 0 4px 4px 0; font-size: 14px; color: #92400e; }
+        .step { font-weight: bold; color: #4f46e5; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Add Admin: Mr. Vincent</h1>
+        <p>Run this SQL in your <strong>Supabase SQL Editor</strong> to create the Admin account for Mr. Vincent. This statement handles both the authentication entry and the user metadata required by the app.</p>
+        
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode()">Copy SQL</button>
+            <pre id="sql-code">-- 1. Generate a new user in Supabase Auth
+-- Email: vincent@leonisa.com
+-- Password: VincentPassword2025 (Change this after login!)
+
+INSERT INTO auth.users (
+  id,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_user_meta_data,
+  aud,
+  role
+) VALUES (
+  gen_random_uuid(),
+  'vincent@leonisa.com',
+  extensions.crypt('VincentPassword2025', extensions.gen_salt('bf')),
+  now(),
+  '{"role": "ADMIN", "username": "Mr. Vincent"}',
+  'authenticated',
+  'authenticated'
+);
+
+-- Note: The trigger created in schema.sql will automatically 
+-- create the entry in public.profiles for this user.</pre>
+        </div>
+
+        <div class="warning">
+            <strong>Security Notice:</strong> After running this script, Mr. Vincent can log in using <code>vincent@leonisa.com</code> and the password <code>VincentPassword2025</code>. It is highly recommended to change the password immediately via the Supabase dashboard or an app "Reset Password" flow.
+        </div>
+
+        <div style="margin-top: 24px; font-size: 14px;">
+            <p><span class="step">Step 1:</span> Open Supabase SQL Editor.</p>
+            <p><span class="step">Step 2:</span> Paste code and click 'Run'.</p>
+            <p><span class="step">Step 3:</span> Log in to Leonisa's Store with these credentials.</p>
+        </div>
+    </div>
+
+    <script>
+        function copyCode() {
+            const code = document.getElementById('sql-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-button');
+                btn.innerText = 'Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerText = 'Copy SQL';
+                    btn.style.background = '#4f46e5';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
